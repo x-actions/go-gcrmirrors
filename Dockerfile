@@ -26,7 +26,7 @@ RUN mkdir /usr/local/go-gcrmirrors/ && \
     curl -s https://api.github.com/repos/x-actions/go-gcrmirrors/releases/latest | \
     sed -r -n '/browser_download_url/{/linux.tar.gz/{s@[^:]*:[[:space:]]*"([^"]*)".*@\1@g;p;q}}' | xargs wget && \
     tar xzf *linux.tar.gz -C /usr/local/go-gcrmirrors/ && \
-    cp /usr/local/go-gcrmirrors/go-gcrmirrors_*_linux/go-gcrmirrors /usr/local/bin/ && \
+    cp /usr/local/go-gcrmirrors/gcrmirrors_*_linux/gcrmirrors /usr/local/bin/ && \
     rm -rf /usr/local/go-gcrmirrors/
 
 ADD entrypoint.sh /

@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-SOURCE_DIR=${SUB_DIR:-"gcr.io"}
-PUBLIC_DIR=${PUBLIC_DIR:-"./publsh"}
+SOURCE_DIR=${SOURCE_DIR:-"gcr.io"}
+PUBLIC_DIR=${PUBLIC_DIR:-"/github/workspace/public"}
 
 if test -z "${SOURCE_DIR}"; then
   echo "SOURCE_DIR is nil, skip!"
@@ -18,6 +18,6 @@ echo "## generate json ##################"
 
 gcrmirrors \
   -sourceDir "/github/workspace/${SOURCE_DIR}" \
-  -publicDir ${PUBLIC_DIR}
+  -publicDir "${PUBLIC_DIR}"
 
 echo "## Done. ##################"
