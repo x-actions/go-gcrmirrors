@@ -98,6 +98,9 @@ type Mirror struct {
 	ImageCount         int    `json:"image_count"`
 	SrcImageListURL    string `json:"src_image_list_url"`
 	RawSrcImageListURL string `json:"raw_src_image_list_url"`
+	ActionName         string `json:"action_name"`
+	BadgeURL           string `json:"badge_url"`
+	WorkflowURL        string `json:"workflow_url"`
 }
 
 type MirrorResponse struct {
@@ -142,16 +145,17 @@ func ParseMirrorAction(actions []*Action, sourceDir string) []*Mirror {
 					destRepoArray := strings.Split(destRepo, "/")
 					shortDestRepo := destRepoArray[len(destRepoArray)-1]
 					rawSrcImageListURL := step.Env["SRC_IMAGE_LIST_URL"].(string)
-
-					temp := strings.Split(rawSrcImageListURL, "/")
-					imageFileName := strings.Join(temp[len(temp)-2:], "/")
-					srcRepo, imageCount, _ := parseImageFile(path.Join(sourceDir, imageFileName))
+					fileRelativePath := parseTxtRelativePath(rawSrcImageListURL)
+					srcRepo, imageCount, _ := parseImageFile(path.Join(sourceDir, fileRelativePath))
 
 					srcImageListURL := fmt.Sprintf(
-						"https://github.com/%s/%s/blob/main/%s",
-						step.Env["GIT_ORG"],
-						step.Env["GIT_REPO"],
-						imageFileName)
+						"https://github.com/%s/%s/blob/main/%s", step.Env["GIT_ORG"], step.Env["GIT_REPO"],
+						fileRelativePath)
+					workflowFileName := strings.ReplaceAll(action.Name, "/", "-")
+					badgeURL := fmt.Sprintf(
+						"https://github.com/x-mirrors/gcr.io/actions/workflows/%s.yml/badge.svg", workflowFileName)
+					workflowUrl :=
+						fmt.Sprintf("https://github.com/x-mirrors/gcr.io/actions/workflows/%s.yml", workflowFileName)
 
 					mirror := Mirror{
 						Name:               name,
@@ -161,6 +165,9 @@ func ParseMirrorAction(actions []*Action, sourceDir string) []*Mirror {
 						SrcImageListURL:    srcImageListURL,
 						RawSrcImageListURL: rawSrcImageListURL,
 						ImageCount:         imageCount,
+						ActionName:         action.Name,
+						BadgeURL:           badgeURL,
+						WorkflowURL:        workflowUrl,
 					}
 					mirrors = append(mirrors, &mirror)
 				}
@@ -210,8 +217,7 @@ func mirrorImageName(srcImage string, mirror *Mirror) string {
 func ParseSourceImages(mirrors []*Mirror, sourceDir string) []*ImageMap {
 	var imageMaps []*ImageMap
 	for _, mirror := range mirrors {
-		temp := strings.Split(mirror.SrcImageListURL, "/")
-		srcImageListFilePath := path.Join(sourceDir, temp[len(temp)-1])
+		srcImageListFilePath := path.Join(sourceDir, parseTxtRelativePath(mirror.SrcImageListURL))
 		srcImageList, _ := readFile(srcImageListFilePath)
 
 		for _, srcImage := range srcImageList {

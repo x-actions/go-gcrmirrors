@@ -1,0 +1,50 @@
+name: Release new action version
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Release
+        uses: softprops/action-gh-release@v1
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+
+      - name: Check Go Version and Install Go Dep
+        run: |
+          cd gcrmirrors
+          go version
+          go mod vendor
+
+      - name: Build
+        run: |
+          cd gcrmirrors
+          make linux
+          make mac
+
+      - name: Generate Release.txt
+        run: |
+          echo ${{ github.sha }} > Release.txt
+          cat Release.txt
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            Release.txt
+            LICENSE
+            gcrmirrors/bin/gcrmirrors_*_linux.tar.gz
+            gcrmirrors/bin/gcrmirrors_*_mac.tar.gz

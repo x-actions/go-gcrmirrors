@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -73,7 +72,7 @@ func main() {
 	mirrorsResponse, _ := json.Marshal(github.MirrorResponse{
 		Data: mirrors,
 	})
-	err = ioutil.WriteFile(mirrorReposPath, mirrorsResponse, 0666)
+	err = os.WriteFile(mirrorReposPath, mirrorsResponse, 0666)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -84,7 +83,7 @@ func main() {
 	imageMapsResponse, _ := json.Marshal(github.ImageMapResponse{
 		Data: imageMaps,
 	})
-	err = ioutil.WriteFile(mirrorImagesPath, imageMapsResponse, 0666)
+	err = os.WriteFile(mirrorImagesPath, imageMapsResponse, 0666)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
