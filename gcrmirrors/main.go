@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"gcrmirrors/github"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
+
+	"gcrmirrors/github"
 )
 
 var publicDir string
