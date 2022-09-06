@@ -208,7 +208,13 @@ func mirrorImageName(srcImage string, mirror *Mirror) string {
 		return fmt.Sprintf("%s/%s", mirror.ShortDestRepo, items[len(items)-1])
 	} else if len(items) > 3 {
 		length := len(items)
-		return fmt.Sprintf("%s/%s-%s", mirror.ShortDestRepo, items[length-3], items[length-1])
+		if "cmd" == items[length-2] {
+			return fmt.Sprintf("%s/%s-%s", mirror.ShortDestRepo, items[length-3], items[length-1])
+		} else if "cmd" == items[length-3] {
+			return fmt.Sprintf("%s/%s-%s-%s", mirror.ShortDestRepo, items[length-4], items[length-2], items[length-1])
+		} else {
+			return fmt.Sprintf("%s/%s-%s", mirror.ShortDestRepo, items[length-3], items[length-1])
+		}
 	}
 
 	return ""
