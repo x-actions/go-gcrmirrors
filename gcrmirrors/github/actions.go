@@ -2,7 +2,7 @@ package github
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"path"
@@ -127,7 +127,7 @@ func parseImageFile(imageFile string) (string, int, error) {
 
 	count := 0
 	for _, line := range lines {
-		if strings.HasPrefix(line, "#") == false {
+		if !strings.HasPrefix(line, "#") {
 			count++
 		}
 	}
@@ -192,7 +192,7 @@ func readFile(filePath string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	b, err := ioutil.ReadAll(file)
+	b, err := io.ReadAll(file)
 	if err != nil {
 		return nil, err
 	}
@@ -205,12 +205,16 @@ func mirrorImageName(srcImage string, mirror *Mirror) string {
 	if len(items) == 2 {
 		return fmt.Sprintf("%s/%s", mirror.ShortDestRepo, items[len(items)-1])
 	} else if len(items) == 3 {
-		return fmt.Sprintf("%s/%s", mirror.ShortDestRepo, items[len(items)-1])
+		if strings.HasPrefix(srcImage, "registry.k8s.io") {
+			return fmt.Sprintf("%s/%s", mirror.ShortDestRepo, strings.Join(items[1:], "-"))
+		} else {
+			return fmt.Sprintf("%s/%s", mirror.ShortDestRepo, items[len(items)-1])
+		}
 	} else if len(items) > 3 {
 		length := len(items)
-		if "cmd" == items[length-2] {
+		if items[length-2] == "cmd" {
 			return fmt.Sprintf("%s/%s-%s", mirror.ShortDestRepo, items[length-3], items[length-1])
-		} else if "cmd" == items[length-3] {
+		} else if items[length-3] == "cmd" {
 			return fmt.Sprintf("%s/%s-%s-%s", mirror.ShortDestRepo, items[length-4], items[length-2], items[length-1])
 		} else {
 			return fmt.Sprintf("%s/%s-%s", mirror.ShortDestRepo, items[length-3], items[length-1])
@@ -227,7 +231,7 @@ func ParseSourceImages(mirrors []*Mirror, sourceDir string) []*ImageMap {
 		srcImageList, _ := readFile(srcImageListFilePath)
 
 		for _, srcImage := range srcImageList {
-			if strings.HasPrefix(srcImage, "#") == false && strings.Trim(srcImage, " ") != "" {
+			if !strings.HasPrefix(srcImage, "#") && strings.Trim(srcImage, " ") != "" {
 				im := ImageMap{
 					SrcImage:    srcImage,
 					MirrorImage: mirrorImageName(srcImage, mirror),

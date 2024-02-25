@@ -3,7 +3,7 @@ description: 'Github Action for auto generate https://github.com/kbcx/mirrors.kb
 author: 'xiexianbin <me@xiexianbin>'
 inputs:
   SOURCE_DIR:
-    description: 'https://github.com/kbcx/gcr.io dir'
+    description: 'https://github.com/x-mirrors/gcr.io dir'
     required: true
   PUBLIC_DIR:
     description: 'json publish dir'

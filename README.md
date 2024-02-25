@@ -1,10 +1,10 @@
 # go-gcrmirrors
 
-auto generate https://github.com/kbcx/mirrors.kb.cx api json from https://github.com/kbcx/gcr.io
+auto generate https://github.com/kbcx/mirrors.kb.cx api json from https://github.com/x-mirrors/gcr.io
 
 ## Environment Variables
 
-- SOURCE_DIR: https://github.com/kbcx/gcr.io path
+- SOURCE_DIR: https://github.com/x-mirrors/gcr.io path
 - PUBLIC_DIR: json public dir
 
 ## How to Use
